@@ -6,7 +6,7 @@
 				[routerLink]="tab.link"
 				routerLinkActive #rla="routerLinkActive"
 				[active]="rla.isActive"
-				>{{tab.panel}}</a>
+				>{{tab.label}}</a>
 		</nav>
 		<mat-tab-nav-panel #tabPanel>
 			<router-outlet></router-outlet>

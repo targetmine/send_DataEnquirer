@@ -5,7 +5,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { QuerierModule } from './querier/querier.module';
-import { SharedModule } from './shared/shared.module';
 
 import { MatTabsModule } from '@angular/material/tabs';
 
@@ -18,7 +17,6 @@ import { MatTabsModule } from '@angular/material/tabs';
     BrowserModule,
     AppRoutingModule,
 		QuerierModule,
-		SharedModule,
 		MatTabsModule
   ],
   providers: [],

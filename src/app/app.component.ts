@@ -18,7 +18,7 @@ export class AppComponent implements OnInit{
 	}
 
 	ngOnInit(): void {
-		this.router.events.subscribe(response => {
+		this.router.events.subscribe(() => {
 			this.activeTabIndex = this.tabs.indexOf(
 				this.tabs.find((t: {link: string; }) => t.link === `.${this.router.url}`)
 			);
