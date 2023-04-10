@@ -1,1 +1,90 @@
-<p>model-display works!</p>
+<h3>Elements:</h3>
+<table mat-table 
+	[dataSource]="elements"
+	#elementsTable
+	>
+	<ng-container matColumnDef="elements">
+		<th mat-header-cell *matHeaderCellDef> Element </th>
+		<td mat-cell *matCellDef="let element">
+			<span
+				class="table-text-span" 
+				>{{element.name}}
+			</span>
+			<span 
+				class="button-span"
+				>
+				<button mat-icon-button
+					class="table-button"
+					matTooltip="Upload data"
+					>
+				</button>
+			</span>
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="attributes">
+		<th mat-header-cell *matHeaderCellDef> Attributes </th>
+		<td mat-cell *matCellDef="let element">
+			<div *ngFor="let attr of element.attributes">				
+				<span
+					class="table-text-span"
+					>{{attr.name}}
+				</span>
+				<span 
+					class="button-span"
+					>
+					<button mat-icon-button
+						class="table-button"
+						matTooltip="Upload data"
+						>
+					</button>
+				</span>
+			</div>
+		</td>
+	</ng-container>
+
+	<tr mat-header-row *matHeaderRowDef="elementTableColumns"></tr>
+	<tr mat-row *matRowDef="let row; columns: elementTableColumns;"></tr>
+</table>
+
+<h3>Relations:</h3>
+<table mat-table
+	[dataSource]="relations"
+	#relationsTable
+	>
+	<ng-container matColumnDef="source">
+		<th mat-header-cell *matHeaderCellDef> Source </th>
+		<td mat-cell *matCellDef="let relation">
+			<span>{{relation.srcElement}}/{{relation.srcAttribute}}</span>
+		</td>
+	</ng-container>
+	<ng-container matColumnDef="target">
+		<th mat-header-cell *matHeaderCellDef> Target </th>
+		<td mat-cell *matCellDef="let relation">
+			<span>{{relation.trgElement}}/{{relation.trgAttribute}}</span>
+		</td>
+	</ng-container>
+	<ng-container matColumnDef="cardinality">
+		<th mat-header-cell *matHeaderCellDef> Cardinality </th>
+		<td mat-cell *matCellDef="let relation">
+			<span>{{relation.cardinality}}</span>
+		</td>
+	</ng-container>
+	<ng-container matColumnDef="actions">
+		<th mat-header-cell *matHeaderCellDef></th>
+		<td mat-cell *matCellDef="let relation">
+			
+			<button mat-icon-button
+				class="table-button"
+				matTooltip="Remove"
+				>
+				
+			</button>
+		</td>
+	</ng-container>
+
+	<tr mat-header-row *matHeaderRowDef="relationTableColumns"></tr>
+	<tr mat-row *matRowDef="let row; columns: relationTableColumns;"></tr>
+</table>
+
+
