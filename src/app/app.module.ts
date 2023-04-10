@@ -7,6 +7,8 @@ import { AppComponent } from './app.component';
 import { QuerierModule } from './querier/querier.module';
 import { SharedModule } from './shared/shared.module';
 
+import { MatTabsModule } from '@angular/material/tabs';
+
 @NgModule({
   declarations: [
     AppComponent
@@ -16,7 +18,8 @@ import { SharedModule } from './shared/shared.module';
     BrowserModule,
     AppRoutingModule,
 		QuerierModule,
-		SharedModule
+		SharedModule,
+		MatTabsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
