@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ModelDisplayComponent } from './components/model-display/model-display.component';
 
 import { MatTableModule } from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @NgModule({
   declarations: [
@@ -10,7 +12,9 @@ import { MatTableModule } from '@angular/material/table';
 	],
   imports: [
     CommonModule,
-		MatTableModule
+		MatTableModule,
+		MatButtonModule,
+		MatCheckboxModule
   ],
 	exports: [
 		ModelDisplayComponent

@@ -19,7 +19,6 @@ import { MatButtonModule } from '@angular/material/button';
 		MatButtonModule,
 		BrowserAnimationsModule,
 		MatToolbarModule,
-		
   ]
 })
 export class QuerierModule { }

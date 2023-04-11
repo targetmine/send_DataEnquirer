@@ -1,0 +1,4 @@
+{
+	"elements": [{"name":"Gene","attributes":[{"name":"geneid","type":"integer","unique":true},{"name":"symbol","type":"varchar(40)","unique":false},{"name":"ab40","type":"double precision","unique":false}]},{"name":"Protein","attributes":[{"name":"accession","type":"varchar(40)","unique":true}]}],
+	"relations": [{"name":"Ggen_P","srcElement":"Gene","srcAttribute":"geneid","srcType":"integer","trgElement":"Protein","trgAttribute":"accession","trgType":"varchar(40)","cardinality":"one to one"}]
+}
