@@ -1,9 +1,10 @@
 import { AfterContentInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatTable, MatTableDataSource} from '@angular/material/table';
 
-import { Element } from '../../models/element';
-import { Attribute } from '../../models/attribute';
-import { Relation } from '../../models/relation';
+import { BackendService } from 'src/app/shared/service/backend.service';
+import { Element } from 'src/app/shared/models/element';
+import { Attribute } from 'src/app/shared/models/attribute';
+import { Relation } from 'src/app/shared/models/relation';
 
 import model from 'src/assets/model.json';
 
@@ -29,6 +30,10 @@ export class ModelDisplayComponent implements AfterContentInit{
 	previewTable!: MatTable<string[]>;
 	previewTableData: MatTableDataSource<string> = new MatTableDataSource<string>();
 	previewTableColumns: string[] = [];
+
+	constructor(
+		public readonly backendService: BackendService
+	){ }
 
 	ngAfterContentInit(): void {
 		let eles: Element[] = [];
@@ -57,7 +62,8 @@ export class ModelDisplayComponent implements AfterContentInit{
 	}
 
 	onPreview(): void {
-		throw new Error('need to implement this function');
+		this.backendService.getElement(this.elements.data[0])
+			.then(response => console.log(response.body));
 	}
 
 	onDownload(): void {
