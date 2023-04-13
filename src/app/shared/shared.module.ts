@@ -5,6 +5,8 @@ import { ModelDisplayComponent } from './components/model-display/model-display.
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatTreeModule } from '@angular/material/tree';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -14,7 +16,9 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     CommonModule,
 		MatTableModule,
 		MatButtonModule,
-		MatCheckboxModule
+		MatCheckboxModule,
+		MatTreeModule,
+		MatIconModule
   ],
 	exports: [
 		ModelDisplayComponent
