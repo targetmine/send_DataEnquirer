@@ -1,64 +1,50 @@
 <h3>Model:</h3>
 
 <mat-tree
-	[dataSource]="elements"
+	[dataSource]="modelElements"
 	[treeControl]="modelControl"
-	#elementsTable
-	>
-	<mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
-		<button mat-icon-button 
-			matTreeNodeToggle
-			[attr.aria-label]="'Toggle '+node.name">
-			<mat-icon>
-				{{modelControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-			</mat-icon>
-		</button>
-		{{node.name}}
-	</mat-tree-node>
-	
-	<mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
-		<button mat-icon-button disabled></button>
-		<mat-checkbox>
+	class="example-tree"
+	#elementsTree>  
+	<!-- Template for leaf nodes -->
+  <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
+    <mat-checkbox>
 			{{node.name}}
 		</mat-checkbox>
-	</mat-tree-node>
-	
-
+  </mat-tree-node>
+  <!-- Template for expandable nodes -->
+  <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild">
+    <div class="mat-tree-node">
+      <button mat-icon-button 
+				matTreeNodeToggle
+        [attr.aria-label]="'Toggle ' + node.name">
+        <mat-icon class="mat-icon-rtl-mirror">
+          {{modelControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+        </mat-icon>
+      </button>
+      {{node.name}}
+    </div>
+    <!-- There is inline padding applied to this div using styles.
+      This padding value depends on the mat-icon-button width.  -->
+    <div [class.example-tree-invisible]="!modelControl.isExpanded(node)"
+      role="group">
+      <ng-container matTreeNodeOutlet></ng-container>
+    </div>
+  </mat-nested-tree-node>
 </mat-tree>
 
-<h3>Relations:</h3>
-<table mat-table
-	[dataSource]="relations"
-	#relationsTable
-	>
-	<ng-container matColumnDef="boxes">
-		<th mat-header-cell *matHeaderCellDef> </th>
-		<td mat-cell *matCellDef="let relation">
-			<mat-checkbox></mat-checkbox>
-		</td>
-	</ng-container>
-	<ng-container matColumnDef="source">
-		<th mat-header-cell *matHeaderCellDef> Source </th>
-		<td mat-cell *matCellDef="let relation">
-				{{relation.srcElement}}/{{relation.srcAttribute}}
-		</td>
-	</ng-container>
-	<ng-container matColumnDef="target">
-		<th mat-header-cell *matHeaderCellDef> Target </th>
-		<td mat-cell *matCellDef="let relation">
-			<span>{{relation.trgElement}}/{{relation.trgAttribute}}</span>
-		</td>
-	</ng-container>
-	<tr mat-header-row *matHeaderRowDef="relationTableColumns"></tr>
-	<tr mat-row *matRowDef="let row; columns: relationTableColumns;"></tr>
-</table>
-
-
+<div>
 <button mat-button
 	id="submit"
 	(click)="onPreview()"
 	>Preview
 </button> 
+
+<button mat-button
+	id="submit"
+	(click)="onDownload()"
+	>Download
+</button> 
+</div>
 
 <table mat-table 
 	[dataSource]="previewTableData"
@@ -70,15 +56,11 @@
 	>
 		<th mat-header-cell *matHeaderCellDef>{{column}}</th>
 		<td mat-cell *matCellDef="let item">
-			{{item.split(',')[i]}}
+			{{item[column]}}
 		</td>
 	</ng-container>
 	<tr mat-header-row *matHeaderRowDef="previewTableColumns"></tr>
 	<tr mat-row *matRowDef="let row; columns: previewTableColumns"></tr>
 </table>
 
-<button mat-button
-	id="submit"
-	(click)="onDownload()"
-	>Download
-</button> 
+

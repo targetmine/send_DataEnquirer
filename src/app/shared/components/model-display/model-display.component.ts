@@ -1,68 +1,52 @@
-import { AfterContentInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTable, MatTableDataSource} from '@angular/material/table';
 
-import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
+import { MatTreeNestedDataSource } from '@angular/material/tree';
+import { NestedTreeControl } from '@angular/cdk/tree';
+import { FormGroup, FormControl } from '@angular/forms';
 
 import { BackendService } from 'src/app/shared/service/backend.service';
 import { Element } from 'src/app/shared/models/element';
-import { Attribute } from 'src/app/shared/models/attribute';
-import { Relation } from 'src/app/shared/models/relation';
-import { ModelNode, ModelFlatNode } from 'src/app/shared/models/modelNode';
-
-import model from 'src/assets/model.json';
-import { FlatTreeControl } from '@angular/cdk/tree';
+import { Model, ModelNode} from 'src/app/shared/models/model';
+import { JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-model-display',
   templateUrl: './model-display.component.html',
   styleUrls: ['./model-display.component.css']
 })
-export class ModelDisplayComponent {
+export class ModelDisplayComponent implements OnInit{
 
-	modelControl: FlatTreeControl<ModelFlatNode>;
-	modelFlatterner: MatTreeFlattener<ModelNode, ModelFlatNode>;
+	modelControl: NestedTreeControl<ModelNode> = new NestedTreeControl<ModelNode>(node => node.children);
+	modelElements: MatTreeNestedDataSource<ModelNode> = new MatTreeNestedDataSource();;
+	modelForm = new FormGroup({});	
 	
-	elements: MatTreeFlatDataSource<ModelNode, ModelFlatNode>;
-	relations: MatTableDataSource<Relation> = new MatTableDataSource<Relation>();
-
-	@ViewChild('elementsTable')
-	elementTable!: MatTable<Element[]>;
-	elementTableColumns: string[] = ['elements', 'attributes'];
-
-	@ViewChild('relationsTable')
-	relationTable!: MatTable<Relation[]>;
-	relationTableColumns: string[] = ['boxes', 'source', 'target'];
-
 	@ViewChild('previewTable')
-	previewTable!: MatTable<string[]>;
-	previewTableData: MatTableDataSource<string> = new MatTableDataSource<string>();
+	previewTable!: MatTable<any[]>;
+	previewTableData: MatTableDataSource<any> = new MatTableDataSource<any>();
 	previewTableColumns: string[] = [];
 
 	constructor(
 		public readonly backendService: BackendService
-	){ 	
+	){ }
 
-		this.modelControl = new FlatTreeControl<ModelFlatNode>(
-			node => node.level,
-			node => node.expandable
-		);
-		this.modelFlatterner = new MatTreeFlattener(
-			this.transformer,
-			node => node.level,
-			node => node.expandable,
-			node => node.children,
-		)
-		this.elements = new MatTreeFlatDataSource(this.modelControl, this.modelFlatterner);
+	ngOnInit(): void {
+		this.backendService.getModel()
+			.then(response => {
+				let data: ModelNode[] = [];
+				response.body?.elements.forEach((value: any) => {
+					let children: ModelNode[] = [];
+					value.attributes.forEach((a:any) => children.push( {name: a.name, children: [] } as unknown as ModelNode));
+					data.push( { name: value.name, children } as unknown as ModelNode );
+				});
+				this.modelElements.data = data;
+			})
+			.catch(error => {
+				console.error('Error loading the model from the server');
+			});
+		
 
-		let data: ModelNode[] = [];
-		model['elements'].forEach((value: any) => {
-			let children: ModelNode[] = [];
-			value.attributes.forEach((a:any) => children.push( {name: a.name, children: [] } as unknown as ModelNode));
-			data.push( { name: value.name, children } as unknown as ModelNode );
-		});
-		this.elements.data = data;
-
-			// 	// let rels: Relation[] = [];
+		// 	// let rels: Relation[] = [];
 	// 	// model['relations'].forEach((value: any) => {
 	// 	// 		let r: Relation = { 
 	// 	// 			name: value.name, 
@@ -78,20 +62,37 @@ export class ModelDisplayComponent {
 		
 	}
 
-	transformer(node: ModelNode, level: number): ModelFlatNode {
-		return { 
-			expandable: !!node.children && node.children.length > 0,
-			name: node.name, 
-			level } as ModelFlatNode;
-	};
-
-	hasChild(_: number, node: ModelFlatNode): boolean {
-		return node.expandable;
+	hasChild(_: number, node: ModelNode): boolean {
+		return !!node.children && node.children.length > 0;
 	}
 
 	onPreview(): void {
-		this.backendService.getElement({ name: 'gene'} as Element )//this.elements.data[0])
-			.then(response => console.log(response.body));
+		
+		
+		this.backendService.getModel()
+			.then(response => console.log(response))
+		// this.backendService.getElement({ name: 'gene'} as Element )//this.elements.data[0])
+		// 	.then(response => {
+		// 		console.log(response.body)
+		// 		this.previewTableData = new MatTableDataSource<any>(response.body as any[]);
+		// 		let rows: any[];
+		// model['relations'].forEach((value: any) => {
+		// 		let r: Relation = { 
+		// 			name: value.name, 
+		// 		 	srcElement: value.srcElement,
+		// 			srcAttribute: value.srcAttribute,
+		// 			trgElement: value.trgElement,
+		// 			trgAttribute: value.trgAttribute,
+		// 			cardinality: value.cardinality
+		// 		} as Relation;
+		// 		rels.push(r);
+		// 	});
+		// this.relations = new MatTableDataSource<Relation>(rels);
+				
+			// })
+			.catch(error => {
+				console.error(error);
+			});
 	}
 
 	onDownload(): void {
