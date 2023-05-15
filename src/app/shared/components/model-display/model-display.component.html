@@ -1,15 +1,18 @@
 <h3>Model:</h3>
 
-<mat-tree
-	[dataSource]="modelElements"
-	[treeControl]="modelControl"
-	class="example-tree"
-	#elementsTree>  
-	<!-- Template for leaf nodes -->
-  <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
-    <mat-checkbox>
-			{{node.name}}
-		</mat-checkbox>
+<form [formGroup]="modelForm">
+	<mat-tree
+		[dataSource]="modelElements"
+		[treeControl]="modelControl"
+		class="example-tree"
+		#elementsTree>  
+		<!-- Template for leaf nodes -->
+  	<mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
+    	<mat-checkbox
+				[formControlName]="node.control"
+				(change)="checkboxChange(node, $event.checked)">
+				{{node.name}}
+			</mat-checkbox>
   </mat-tree-node>
   <!-- Template for expandable nodes -->
   <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild">
@@ -31,3 +34,4 @@
     </div>
   </mat-nested-tree-node>
 </mat-tree>
+</form>

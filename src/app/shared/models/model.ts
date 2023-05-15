@@ -31,5 +31,6 @@ export interface Relation{
 
 export interface ModelNode {
 	name: string;
+	control: string;
 	children: ModelNode[];
 }
