@@ -1,14 +1,12 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatTable, MatTableDataSource} from '@angular/material/table';
+import { Component, OnInit } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 import { NestedTreeControl } from '@angular/cdk/tree';
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 
 import { BackendService } from 'src/app/shared/service/backend.service';
-import { Element } from 'src/app/shared/models/element';
-import { Model, ModelNode} from 'src/app/shared/models/model';
-import { JsonPipe } from '@angular/common';
+import { Element, Attribute, Relation, ModelNode} from 'src/app/shared/models/model';
 
 @Component({
   selector: 'app-model-display',
@@ -17,85 +15,68 @@ import { JsonPipe } from '@angular/common';
 })
 export class ModelDisplayComponent implements OnInit{
 
-	modelControl: NestedTreeControl<ModelNode> = new NestedTreeControl<ModelNode>(node => node.children);
-	modelElements: MatTreeNestedDataSource<ModelNode> = new MatTreeNestedDataSource();;
-	modelForm = new FormGroup({});	
+	model$: BehaviorSubject<ModelNode[]>;
+	modelControl: NestedTreeControl<ModelNode>;
+	modelElements: MatTreeNestedDataSource<ModelNode>;
 	
-	@ViewChild('previewTable')
-	previewTable!: MatTable<any[]>;
-	previewTableData: MatTableDataSource<any> = new MatTableDataSource<any>();
-	previewTableColumns: string[] = [];
+	modelForm = new FormGroup({});	
+	loading: boolean = true;
 
 	constructor(
 		public readonly backendService: BackendService
-	){ }
+	){ 
+		this.model$ = new BehaviorSubject<ModelNode[]>([
+			{ name: 'Elements', children: [] as ModelNode[] },
+			{ name: 'Relations', children: [] as ModelNode[] }
+		]);
+		
+		this.modelControl = new NestedTreeControl<ModelNode>(node => node.children);
+		this.modelElements = new MatTreeNestedDataSource();
+		this.model$.subscribe(data => this.modelElements.data = data);
+	}
 
 	ngOnInit(): void {
 		this.backendService.getModel()
 			.then(response => {
-				let data: ModelNode[] = [];
-				response.body?.elements.forEach((value: any) => {
-					let children: ModelNode[] = [];
-					value.attributes.forEach((a:any) => children.push( {name: a.name, children: [] } as unknown as ModelNode));
-					data.push( { name: value.name, children } as unknown as ModelNode );
-				});
-				this.modelElements.data = data;
+				let eles = [] as ModelNode[];
+				let rels = [] as ModelNode[];
+				if(response.body?.elements)
+					eles = this.parseElements(response.body.elements);
+				if(response.body?.relations) 
+					rels = this.parseRelations(response.body.relations);
+
+				this.model$.next([
+					{ name: 'Elements', children: eles },
+					{ name: 'Relations', children: rels }
+				]);
 			})
 			.catch(error => {
 				console.error('Error loading the model from the server');
 			});
-		
-
-		// 	// let rels: Relation[] = [];
-	// 	// model['relations'].forEach((value: any) => {
-	// 	// 		let r: Relation = { 
-	// 	// 			name: value.name, 
-	// 	// 		 	srcElement: value.srcElement,
-	// 	// 			srcAttribute: value.srcAttribute,
-	// 	// 			trgElement: value.trgElement,
-	// 	// 			trgAttribute: value.trgAttribute,
-	// 	// 			cardinality: value.cardinality
-	// 	// 		} as Relation;
-	// 	// 		rels.push(r);
-	// 	// 	});
-	// 	// this.relations = new MatTableDataSource<Relation>(rels);
-		
 	}
 
-	hasChild(_: number, node: ModelNode): boolean {
-		return !!node.children && node.children.length > 0;
+	parseElements(elements: Element[]): ModelNode[]{
+		let parsed: ModelNode[] = [];
+		elements.forEach((e: Element) => {
+			let children: ModelNode[] = [];
+			e.attributes.forEach((a: Attribute) => children.push({name: a.name, children: []} ));
+			parsed.push({name: e.name, children });
+		});
+		return parsed;
 	}
 
-	onPreview(): void {
-		
-		
-		this.backendService.getModel()
-			.then(response => console.log(response))
-		// this.backendService.getElement({ name: 'gene'} as Element )//this.elements.data[0])
-		// 	.then(response => {
-		// 		console.log(response.body)
-		// 		this.previewTableData = new MatTableDataSource<any>(response.body as any[]);
-		// 		let rows: any[];
-		// model['relations'].forEach((value: any) => {
-		// 		let r: Relation = { 
-		// 			name: value.name, 
-		// 		 	srcElement: value.srcElement,
-		// 			srcAttribute: value.srcAttribute,
-		// 			trgElement: value.trgElement,
-		// 			trgAttribute: value.trgAttribute,
-		// 			cardinality: value.cardinality
-		// 		} as Relation;
-		// 		rels.push(r);
-		// 	});
-		// this.relations = new MatTableDataSource<Relation>(rels);
-				
-			// })
-			.catch(error => {
-				console.error(error);
+	parseRelations(relations: Relation[]): ModelNode[]{
+		let parsed: ModelNode[] = [];
+		relations.forEach((r: Relation) => {
+			parsed.push({
+				name: `${r.srcElement}/${r.srcAttribute} - ${r.trgElement}/${r.trgAttribute} (${r.cardinality})`,
+				children: []
 			});
+		});
+		return parsed;
 	}
 
-	onDownload(): void {
-		throw new Error('need to implement this function');
+	hasChild(_:number, node: ModelNode): boolean {
+		return !!node.children && node.children.length > 0;
 	}
 }
