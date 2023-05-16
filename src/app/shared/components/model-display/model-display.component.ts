@@ -3,9 +3,9 @@ import { BehaviorSubject } from 'rxjs';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 import { NestedTreeControl } from '@angular/cdk/tree';
-import { MatCheckboxChange } from '@angular/material/checkbox';
 
 import { BackendService } from 'src/app/shared/service/backend.service';
+import { ModelService } from 'src/app/shared/service/model.service';
 import { Element, Attribute, Relation, ModelNode} from 'src/app/shared/models/model';
 
 @Component({
@@ -15,20 +15,18 @@ import { Element, Attribute, Relation, ModelNode} from 'src/app/shared/models/mo
 })
 export class ModelDisplayComponent implements OnInit{
 
-	model$: BehaviorSubject<ModelNode[]>;
 	modelControl: NestedTreeControl<ModelNode>;
 	modelElements: MatTreeNestedDataSource<ModelNode>;
 	
 	modelForm = new FormGroup({});	
 	
 	constructor(
-		public readonly backendService: BackendService
+		public readonly backendService: BackendService,
+		public readonly modelService: ModelService,
 	){ 
-		this.model$ = new BehaviorSubject<ModelNode[]>([]);
-		
 		this.modelControl = new NestedTreeControl<ModelNode>(node => node.children);
 		this.modelElements = new MatTreeNestedDataSource();
-		this.model$.subscribe(data => {
+		this.modelService.model$.subscribe(data => {
 			this.initControls(this.flatControlNames(data));
 			this.modelElements.data = data;
 		});
@@ -43,7 +41,7 @@ export class ModelDisplayComponent implements OnInit{
 					this.parseRelations(response.body.relations):
 					[] as ModelNode[];
 					
-				this.model$.next([
+				this.modelService.model$.next([
 					{ name: 'Elements', control: '', children: eles },
 					{ name: 'Relations', control: '', children: rels }
 				]);
@@ -108,5 +106,13 @@ export class ModelDisplayComponent implements OnInit{
 
 	checkboxChange(source: ModelNode, checked: boolean){
 		console.log(source, checked);
+	}
+
+	onPreview(){
+		this.backendService.getModel()
+			.then(response => console.log(response))
+			.catch(error => {
+				console.error(error);
+			});
 	}
 }
