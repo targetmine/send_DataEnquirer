@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
-import { Element } from 'src/app/shared/models/element';
-import { Model } from 'src/app/shared/models/model'; 
+import { Element, Model } from 'src/app/shared/models/model';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
