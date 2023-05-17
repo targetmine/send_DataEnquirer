@@ -75,7 +75,7 @@ export class ModelDisplayComponent implements OnInit{
 		let parsed: ModelNode[] = [];
 		relations.forEach((r: Relation) => {
 			parsed.push({
-				name: `${r.srcElement}/${r.srcAttribute} - ${r.trgElement}/${r.trgAttribute} (${r.cardinality})`,
+				name: `${r.srcElement}/${r.srcAttribute} - ${r.trgElement}/${r.trgAttribute} - ${r.cardinality}`,
 				control: `rel_${r.name}`,
 				children: []
 			});
@@ -108,11 +108,5 @@ export class ModelDisplayComponent implements OnInit{
 		console.log(source, checked);
 	}
 
-	onPreview(){
-		this.backendService.getModel()
-			.then(response => console.log(response))
-			.catch(error => {
-				console.error(error);
-			});
-	}
+
 }

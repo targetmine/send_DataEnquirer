@@ -11,7 +11,7 @@ import { MatTreeModule } from '@angular/material/tree';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatFormFieldModule } from '@angular/material/form-field';
-
+import { MatExpansionModule } from '@angular/material/expansion';
 
 @NgModule({
   declarations: [
@@ -27,7 +27,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 		MatCheckboxModule,
 		MatTreeModule,
 		MatIconModule,
-		MatProgressSpinnerModule
+		MatProgressSpinnerModule,
+		MatExpansionModule
   ],
 	exports: [
 		ModelDisplayComponent,
