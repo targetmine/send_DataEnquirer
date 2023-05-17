@@ -17,12 +17,18 @@ export class ModelQuerierComponent implements OnInit {
 			if(data.length == 0) return;
 			data[0].children.forEach(element => {
 				this.previewTables.push(
-					{ name: element.name }
+					{ 
+						name: element.name,
+						type: 'Element' 
+					}
 				);
 			});
 			data[1].children.forEach(relation => {
 				this.previewTables.push(
-					{ name: relation.name }
+					{ 
+						name: relation.name,
+						type: 'Relation'
+					}
 				)
 			})
 			console.log(this.previewTables);

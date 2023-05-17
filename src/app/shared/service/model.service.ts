@@ -12,4 +12,9 @@ export class ModelService {
   constructor() { 
 		this.model$ = new BehaviorSubject<ModelNode[]>([]);
 	}
+
+	getElementAttributes(name:string):string[]{
+		const ele = this.model$.value[0].children.filter(e => e.name === name );
+		return ele[0].children.map(at => at.name);
+	}
 }
