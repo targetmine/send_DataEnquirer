@@ -30,7 +30,8 @@ export interface Relation{
 }
 
 export interface ModelNode {
+	id: string;
 	name: string;
-	control: string;
+	selected: boolean;
 	children: ModelNode[];
 }
