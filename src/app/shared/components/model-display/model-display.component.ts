@@ -1,6 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { FormControl, FormGroup } from '@angular/forms';
+import { Component } from '@angular/core';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 import { NestedTreeControl } from '@angular/cdk/tree';
 
@@ -13,46 +11,34 @@ import { Element, Attribute, Relation, ModelNode} from 'src/app/shared/models/mo
   templateUrl: './model-display.component.html',
   styleUrls: ['./model-display.component.css']
 })
-export class ModelDisplayComponent implements OnInit{
+export class ModelDisplayComponent{
 
-	modelControl: NestedTreeControl<ModelNode>;
-	modelElements: MatTreeNestedDataSource<ModelNode>;
-	
-	modelForm = new FormGroup({});	
-	
+	elementsTree: MatTreeNestedDataSource<ModelNode>;
+	elementsTreeControl: NestedTreeControl<ModelNode>;
+
 	constructor(
 		public readonly backendService: BackendService,
 		public readonly modelService: ModelService,
 	){ 
-		this.modelControl = new NestedTreeControl<ModelNode>(node => node.children);
-		this.modelElements = new MatTreeNestedDataSource();
-		this.modelService.model$.subscribe(data => {
-			this.initControls(this.flatControlNames(data));
-			this.modelElements.data = data;
+		this.elementsTree = new MatTreeNestedDataSource();
+		this.elementsTreeControl = new NestedTreeControl<ModelNode>(node => node.children);
+
+		this.modelService.elements$.subscribe(data => {
+			this.elementsTree.data = data;
 		});
 
 		this.backendService.getModel()
 			.then(response => {
 				const eles = response.body?.elements ? 
-					this.parseElements(response.body.elements):
+					this.parseElements(response.body.elements) :
 					[] as ModelNode[];
-					
-				const rels = response.body?.relations ? 
-					this.parseRelations(response.body.relations):
-					[] as ModelNode[];
-					
-				this.modelService.model$.next([
-					{ name: 'Elements', control: '', children: eles },
-					{ name: 'Relations', control: '', children: rels }
-				]);
+				this.modelService.elements$.next([
+					{ name: 'Elements', id: 'ele', selected: false, children: eles },
+				]);					
 			})
 			.catch(error => {
 				console.error('Error loading the model from the server');
 			});
-	}
-
-	ngOnInit(): void {
-		console.log(this.modelForm);
 	}
 
 	parseElements(elements: Element[]): ModelNode[]{
@@ -62,11 +48,17 @@ export class ModelDisplayComponent implements OnInit{
 			e.attributes.forEach((a: Attribute) => {
 				children.push({
 					name: a.name, 
-					control: `ele_${e.name}_${a.name}`,
+					id: `ele_${e.name}_${a.name}`,
+					selected: false,
 					children: []
 				})
 			});
-			parsed.push({name: e.name, control: '', children });
+			parsed.push({
+				name: e.name, 
+				id: `ele_${e.name}`, 
+				selected: false, 
+				children 
+			});
 		});
 		return parsed;
 	}
@@ -76,37 +68,65 @@ export class ModelDisplayComponent implements OnInit{
 		relations.forEach((r: Relation) => {
 			parsed.push({
 				name: `${r.srcElement}/${r.srcAttribute} - ${r.trgElement}/${r.trgAttribute} - ${r.cardinality}`,
-				control: `rel_${r.name}`,
+				id: `rel_${r.name}`,
+				selected: false,
 				children: []
 			});
 		});
 		return parsed;
 	}
 
-	flatControlNames(nodes: ModelNode[]): string[]{
-		if( nodes.length == 0) return [];
-		let con = nodes.reduce<string[]>((acc,n)=> {
-			if( n.control !== '')
-				return [...acc, n.control, ...this.flatControlNames(n.children) ]
-			else
-				return [...acc, ...this.flatControlNames(n.children) ]
-		},[])
-		return con;
-	}
-
-	initControls(names: string[]){
-		names.forEach((n: string) => {
-			this.modelForm.addControl(`${n}`, new FormControl(false));
-		});
-	}
-
 	hasChild(_:number, node: ModelNode): boolean {
 		return !!node.children && node.children.length > 0;
 	}
 
-	checkboxChange(source: ModelNode, checked: boolean){
-		console.log(source, checked);
+	getElementParent(node: ModelNode): ModelNode | null{
+		const eles = this.modelService.elements$.value;
+		if ( eles[0] === node ) return null;
+		
+		const name = node.id.split('_');
+		if(name.length === 2) return eles[0];
+
+		return eles[0].children.filter(n => n.name === name[1])[0];
 	}
 
+	updateElementSelection(node: ModelNode): void {
+		this.modelService.selectedElements$.toggle(node);
+		const selected = this.modelService.selectedElements$.isSelected(node);
+		// need to select/deselect all descendants
+		const descendants = this.elementsTreeControl.getDescendants(node);
+		selected ? 
+			this.modelService.selectedElements$.select(...descendants) :
+			this.modelService.selectedElements$.deselect(...descendants);
+		// need to partially select/deselect the parents
+		const parent = this.getElementParent(node);
+		if( parent ) this.updateParentSelection(parent);
+	}
+
+	updateParentSelection(node: ModelNode){
+		const someDescSelected = this.partialElementDescendantsSelected(node);
+		const allDescSelected = this.allElementDescendantsSelected(node);
+		
+		(someDescSelected || allDescSelected) ? 
+			this.modelService.selectedElements$.select(node) :
+			this.modelService.selectedElements$.deselect(node);
+
+		const parent = this.getElementParent(node);
+			if( parent ) this.updateParentSelection(parent);
+	}
+
+	allElementDescendantsSelected(node: ModelNode): boolean {
+		const desc = this.elementsTreeControl.getDescendants(node);
+		const descAllSelected = desc.length > 0 &&
+			desc.every(child => { return this.modelService.selectedElements$.isSelected(child) });
+		return descAllSelected;
+	}
+
+	partialElementDescendantsSelected(node: ModelNode): boolean {
+		const desc = this.elementsTreeControl.getDescendants(node);
+		const descSelected = desc.length > 0 &&
+			desc.some(child => { return this.modelService.selectedElements$.isSelected(child)});
+		return descSelected && !this.allElementDescendantsSelected(node);
+	}
 
 }

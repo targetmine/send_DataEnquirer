@@ -1,5 +1,7 @@
+import { SelectionModel } from '@angular/cdk/collections';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+
 import { ModelNode } from 'src/app/shared/models/model';
 
 @Injectable({
@@ -7,14 +9,16 @@ import { ModelNode } from 'src/app/shared/models/model';
 })
 export class ModelService {
 
-	model$: BehaviorSubject<ModelNode[]>;
-
+	elements$: BehaviorSubject<ModelNode[]>;
+	selectedElements$: SelectionModel<ModelNode>;
+	
   constructor() { 
-		this.model$ = new BehaviorSubject<ModelNode[]>([]);
+		this.elements$ = new BehaviorSubject<ModelNode[]>([]);
+		this.selectedElements$ = new SelectionModel<ModelNode>(true);
 	}
 
-	getElementAttributes(name:string):string[]{
-		const ele = this.model$.value[0].children.filter(e => e.name === name );
-		return ele[0].children.map(at => at.name);
+	getSelectedElements(){
+		const root = this.elements$.value[0];
+		return root.children.filter(_ => this.selectedElements$.isSelected(_));
 	}
 }
