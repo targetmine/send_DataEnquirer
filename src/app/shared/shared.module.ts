@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ModelDisplayComponent } from './components/model-display/model-display.component';
-import { PreviewTableComponent } from './components/preview-table/preview-table.component';
+import { ElementPreviewTableComponent } from './components/element-preview-table/element-preview-table.component';
 
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,7 +16,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 @NgModule({
   declarations: [
 		ModelDisplayComponent,
-  	PreviewTableComponent
+  	ElementPreviewTableComponent
 	],
   imports: [
     CommonModule,
@@ -32,7 +32,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
   ],
 	exports: [
 		ModelDisplayComponent,
-		PreviewTableComponent
+		ElementPreviewTableComponent
 	]
 })
 export class SharedModule { }
