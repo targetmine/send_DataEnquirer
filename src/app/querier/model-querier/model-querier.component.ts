@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ModelService } from 'src/app/shared/service/model.service';
+import { ModelNode } from 'src/app/shared/models/model';
 
 @Component({
   selector: 'app-model-querier',
@@ -8,32 +9,16 @@ import { ModelService } from 'src/app/shared/service/model.service';
 })
 export class ModelQuerierComponent implements OnInit {
 
-	previewTables: any[] = [];
+	elementTables: ModelNode[] = [];
 
 	constructor(
 		public readonly modelService: ModelService
-	){
-		this.modelService.model$.subscribe(data => {
-			if(data.length == 0) return;
-			data[0].children.forEach(element => {
-				this.previewTables.push(
-					{ 
-						name: element.name,
-						type: 'Element' 
-					}
-				);
-			});
-			data[1].children.forEach(relation => {
-				this.previewTables.push(
-					{ 
-						name: relation.name,
-						type: 'Relation'
-					}
-				)
-			})
-			console.log(this.previewTables);
-		})
-	}
+	){ }
 
-	ngOnInit(): void { }
+	ngOnInit(): void { 
+		this.modelService.selectedElements$.changed.subscribe(data => {
+			const eles = this.modelService.selectedElements$.selected.filter(n => n.id.split('_').length === 2);
+			this.elementTables = eles;
+		});
+	}
 }

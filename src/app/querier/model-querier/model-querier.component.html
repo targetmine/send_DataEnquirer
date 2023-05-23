@@ -1,7 +1,7 @@
 <app-model-display></app-model-display>
 
-<app-preview-table *ngFor="let table of previewTables"
-	[name]=table.name
-	[type]=table.type>
-</app-preview-table>
+<app-element-preview-table *ngFor="let element of elementTables"
+	[element]=element
+	>
+</app-element-preview-table>
 
