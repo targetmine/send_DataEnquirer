@@ -12,11 +12,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { RelationPreviewTableComponent } from './components/relation-preview-table/relation-preview-table.component';
 
 @NgModule({
   declarations: [
 		ModelDisplayComponent,
-  	ElementPreviewTableComponent
+  	ElementPreviewTableComponent,
+    RelationPreviewTableComponent
 	],
   imports: [
     CommonModule,
@@ -32,7 +34,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
   ],
 	exports: [
 		ModelDisplayComponent,
-		ElementPreviewTableComponent
+		ElementPreviewTableComponent,
+		RelationPreviewTableComponent
 	]
 })
 export class SharedModule { }

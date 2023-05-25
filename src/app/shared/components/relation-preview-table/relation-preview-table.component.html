@@ -1,16 +1,15 @@
 <mat-expansion-panel>
 	<mat-expansion-panel-header>
-		<mat-panel-title>{{element.name}}</mat-panel-title>
+		<mat-panel-title>{{relation.name}}</mat-panel-title>
 	</mat-expansion-panel-header>
-	
-	<table mat-table 
+
+	<table mat-table
 		[dataSource]="previewTableData"
-		#previewTable
-	>
-		<ng-container 
-			*ngFor="let column of previewTableColumns; let i=index"
-			[matColumnDef]="column"
-		>
+		#previewTable>
+
+		<ng-container
+			*ngFor="let column of previewTableColumns"
+			[matColumnDef]="column">
 			<th mat-header-cell *matHeaderCellDef>{{column}}</th>
 			<td mat-cell *matCellDef="let item">
 				{{item[column]}}
@@ -22,13 +21,12 @@
 
 	<div>
 		<button mat-button
-			(click)="onPreview()"
-			>Preview
-		</button> 
-
+			(click)="onPreview()">
+			Preview
+		</button>
 		<button mat-button
-			(click)="onDownload()"
-			>Download
-		</button> 
+			(click)="onDownload()">
+			Download
+		</button>
 	</div>
 </mat-expansion-panel>
