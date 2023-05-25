@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ModelService } from 'src/app/shared/service/model.service';
-import { ModelNode } from 'src/app/shared/models/model';
+import { Model, ModelNode } from 'src/app/shared/models/model';
 
 @Component({
   selector: 'app-model-querier',
@@ -10,6 +10,7 @@ import { ModelNode } from 'src/app/shared/models/model';
 export class ModelQuerierComponent implements OnInit {
 
 	elementTables: ModelNode[] = [];
+	relationTables: ModelNode[] = [];
 
 	constructor(
 		public readonly modelService: ModelService
@@ -20,5 +21,10 @@ export class ModelQuerierComponent implements OnInit {
 			const eles = this.modelService.selectedElements$.selected.filter(n => n.id.split('_').length === 2);
 			this.elementTables = eles;
 		});
+
+		this.modelService.selectedRelations$.changed.subscribe(data => {
+			const rels = this.modelService.selectedRelations$.selected.filter(n => n.id.split('_').length >= 2);
+			this.relationTables = rels;
+		})
 	}
 }
