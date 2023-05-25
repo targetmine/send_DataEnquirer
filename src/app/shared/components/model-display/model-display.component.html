@@ -9,7 +9,7 @@
 		<button mat-icon-button disabled></button>
 		<mat-checkbox
 			[checked]="modelService.selectedElements$.isSelected(element)"
-			(change)="updateElementSelection(element)">
+			(change)="updateSelection(element, 'element')">
 			{{element.name}}
 		</mat-checkbox>
 	</mat-tree-node>
@@ -21,9 +21,9 @@
 				</mat-icon>
 			</button>
 			<mat-checkbox
-				[indeterminate]="partialElementDescendantsSelected(element)"
-				[checked]="allElementDescendantsSelected(element)"
-				(change)="updateElementSelection(element)">
+				[indeterminate]="partialDescendantsSelected(element, 'element')"
+				[checked]="allDescendantsSelected(element, 'element')"
+				(change)="updateSelection(element, 'element')">
 				{{element.name}}
 			</mat-checkbox>
 		</div>
@@ -35,43 +35,39 @@
 </mat-tree>
 
 
-<!-- <mat-tree
-	[dataSource]="modelElements"
-	[treeControl]="modelControl"
-	class="example-tree"
-	#modelTree>  
-	<!-- Template for leaf nodes 
-	<mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
+<mat-tree
+	[dataSource]="relationsTree"
+	[treeControl]="relationsTreeControl"
+	class="example-tree">  
+
+	<mat-tree-node *matTreeNodeDef="let relation" matTreeNodeToggle>
 		<button mat-icon-button disabled></button>
 		<mat-checkbox
-			[checked]="modelService.selected$.isSelected(node)"
-			(change)="toggleLeafNode(node)">
-			{{node.name}}
+			[checked]="modelService.selectedRelations$.isSelected(relation)"
+			(change)="updateSelection(relation, 'relation')">
+			{{relation.name}}
 		</mat-checkbox>
 	</mat-tree-node>
-	<!-- Template for expandable nodes 
-	<mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild">
+	<mat-nested-tree-node *matTreeNodeDef="let relation; when: hasChild">
 		<div class="mat-tree-node">
-			<button mat-icon-button 
-				matTreeNodeToggle
-				[attr.aria-label]="'Toggle ' + node.name">
+			<button mat-icon-button matTreeNodeToggle>
 				<mat-icon class="mat-icon-rtl-mirror">
-					{{modelControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+					{{relationsTreeControl.isExpanded(relation) ? 'expand_more' : 'chevron_right'}}
 				</mat-icon>
 			</button>
 			<mat-checkbox
-				[checked]="allDescendantsSelected(node)"
-				[indeterminate]="partialDescendantsSelected(node)"
-				(change)="toggleNode(node)">
-				{{node.name}}
+				[checked]="allDescendantsSelected(relation, 'relation')"
+				[indeterminate]="partialDescendantsSelected(relation, 'relation')"
+				(change)="updateSelection(relation, 'relation')">
+				{{relation.name}}
 			</mat-checkbox>
 		</div>
 		<!-- There is inline padding applied to this div using styles.
-		This padding value depends on the mat-icon-button width.  
-		<div [class.example-tree-invisible]="!modelControl.isExpanded(node)"
+		This padding value depends on the mat-icon-button width. -->
+		<div [class.example-tree-invisible]="!relationsTreeControl.isExpanded(relation)"
 			role="group">
 			<ng-container matTreeNodeOutlet></ng-container>
 		</div>
 	</mat-nested-tree-node>
-</mat-tree> -->
+</mat-tree>
 
