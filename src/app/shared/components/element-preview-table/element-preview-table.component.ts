@@ -50,7 +50,28 @@ export class ElementPreviewTableComponent implements OnInit {
 	}
 
 	onDownload(): void {
-		throw new Error('need to implement this function');
+		this.backendService.getElement(this.element.name, this.previewTableColumns)
+		.then(response => {
+			const data = response.body ?
+				response.body as any[] :
+				[] as any[];
+			
+			// specify how you want to handle null values here
+			const replacer = (key: any, value: any) => value === null ? '' : value; 
+			const header = Object.keys(data[0]);
+			let csv = data.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','));
+			csv.unshift(header.join(','));
+			const csvArray = csv.join('\r\n');
+			let objectUrl = URL.createObjectURL(new Blob([csvArray], {type: "text/csv"}));
+			const a = document.createElement('a');
+			a.download = `data.csv`;
+			a.href = objectUrl;
+			a.click();
+			URL.revokeObjectURL(objectUrl);	
+		})
+		.catch(error => {
+			console.error(error);
+		});
 	}
 
 }
