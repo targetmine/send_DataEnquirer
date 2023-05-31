@@ -95,7 +95,6 @@ export class ModelDisplayComponent{
 			this.modelService.elements$.value :
 			this.modelService.relations$.value;
 		
-		console.log('nodes', nodes);
 		if (nodes[0] === node) return null;
 		
 		const name = node.id.split('_');
@@ -105,31 +104,11 @@ export class ModelDisplayComponent{
 		
 	}
 
-	// getElementParent(node: ModelNode): ModelNode | null{
-	// 	const eles = this.modelService.elements$.value;
-	// 	if ( eles[0] === node ) return null;
-		
-	// 	const name = node.id.split('_');
-	// 	if(name.length === 2) return eles[0];
-
-	// 	return eles[0].children.filter(n => n.name === name[1])[0];
-	// }
-
-	// getRelationParent(node: ModelNode): ModelNode | null {
-	// 	const rels = this.modelService.relations$.value;
-	// 	if( rels[0] === node ) return null;
-	// 	const name = node.id.split('_');
-	// 	if(name.length === 2) return rels[0];
-
-	// 	return rels[0].children.filter(n => n.name === name[1])[0];
-	// }
-
 	updateSelection(node: ModelNode, type: 'element'|'relation'): void {
 		if(type === 'element'){
 			this.modelService.selectedElements$.toggle(node);
 			const selected = this.modelService.selectedElements$.isSelected(node);
 			const descendants = this.elementsTreeControl.getDescendants(node);
-			console.log('node desc', descendants);
 			selected ? 
 				this.modelService.selectedElements$.select(...descendants) :
 				this.modelService.selectedElements$.deselect(...descendants);
@@ -138,14 +117,12 @@ export class ModelDisplayComponent{
 			this.modelService.selectedRelations$.toggle(node);
 			const selected = this.modelService.selectedRelations$.isSelected(node);
 			const descendants = this.relationsTreeControl.getDescendants(node);
-			console.log('node desc', descendants);
 			selected ?
 				this.modelService.selectedRelations$.select(...descendants) :	
 				this.modelService.selectedRelations$.deselect(...descendants);
 		}
 
 		const parent = this.getParent(node, type);
-		console.log('parent', parent);
 		if(parent) this.updateParentSelection(parent, type);
 	}
 
@@ -167,30 +144,6 @@ export class ModelDisplayComponent{
 		if(parent) this.updateParentSelection(parent, type);
 	}
 
-	// updateElementSelection(node: ModelNode): void {
-	// 	this.modelService.selectedElements$.toggle(node);
-	// 	const selected = this.modelService.selectedElements$.isSelected(node);
-	// 	// need to select/deselect all descendants
-	// 	const descendants = this.elementsTreeControl.getDescendants(node);
-	// 	selected ? 
-	// 		this.modelService.selectedElements$.select(...descendants) :
-	// 		this.modelService.selectedElements$.deselect(...descendants);
-	// 	// need to partially select/deselect the parents
-	// 	const parent = this.getParent(node, 'element');
-	// 	if( parent ) this.updateParentSelection(parent);
-	// }
-
-	// updateRelationSelection(node: ModelNode): void {
-	// 	this.modelService.selectedRelations$.toggle(node);
-	// 	const selected = this.modelService.selectedRelations$.isSelected(node);
-	// 	const descendants = this.relationsTreeControl.getDescendants(node);
-	// 	selected ?
-	// 		this.modelService.selectedRelations$.select(...descendants) :
-	// 		this.modelService.selectedRelations$.deselect(...descendants);
-	// 	const parent = this.getParent(node, 'relation');
-	// 	if( parent ) this.updateParentSelection(parent);
-	// }
-
 	allDescendantsSelected(node: ModelNode, type: 'element'|'relation'): boolean{
 		if(type === 'element'){
 			const desc = this.elementsTreeControl.getDescendants(node);
@@ -206,14 +159,6 @@ export class ModelDisplayComponent{
 		}
 	}
 
-	// allElementDescendantsSelected(node: ModelNode): boolean {
-		
-	// }
-
-	// allRelationDescendantsSelected(node: ModelNode): boolean{
-	// 	return false;
-	// }
-
 	partialDescendantsSelected(node: ModelNode, type: 'element'|'relation'): boolean{
 		if(type === 'element'){
 			const desc = this.elementsTreeControl.getDescendants(node);
@@ -228,16 +173,4 @@ export class ModelDisplayComponent{
 			return descSelected && !this.allDescendantsSelected(node, type);
 		}
 	}
-
-	// partialElementDescendantsSelected(node: ModelNode): boolean {
-	// 	const desc = this.elementsTreeControl.getDescendants(node);
-	// 	const descSelected = desc.length > 0 &&
-	// 		desc.some(child => { return this.modelService.selectedElements$.isSelected(child)});
-	// 	return descSelected && !this.allElementDescendantsSelected(node);
-	// }
-
-	// partialRelationDescendantsSelected(node: ModelNode): boolean {
-	// 	return false;
-	// }
-
 }

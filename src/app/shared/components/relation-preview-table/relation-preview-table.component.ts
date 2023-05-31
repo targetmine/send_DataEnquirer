@@ -67,8 +67,6 @@ export class RelationPreviewTableComponent{
 					return { Source: row[keys[0]], Target: row[keys[1]] };
 				});
 			}
-			// NEED to parse the body into an array of {target source} elements
-			console.log(response.body, data);
 			this.previewTableData = new MatTableDataSource(data);
 		})
 		.catch(error => {
