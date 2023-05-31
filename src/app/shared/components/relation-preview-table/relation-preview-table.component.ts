@@ -58,10 +58,17 @@ export class RelationPreviewTableComponent{
 		 }
 		this.backendService.getElement(name, columns, 10)
 		.then(response => {
-			const data = response.body ?
-				response.body as any[] :
-				[] as any[];
+			let data = response.body as any[]; 
+			if (data.length === 0) {
+				data = [{Source: 'no data', Target: ''}] as any[];
+			} else {
+				const keys = Object.keys(data[0]);
+				data = data.map(row => { 
+					return { Source: row[keys[0]], Target: row[keys[1]] };
+				});
+			}
 			// NEED to parse the body into an array of {target source} elements
+			console.log(response.body, data);
 			this.previewTableData = new MatTableDataSource(data);
 		})
 		.catch(error => {
