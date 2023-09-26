@@ -1,0 +1,52 @@
+services:
+  datasharing_db:
+    image: postgres
+    container_name: datasharing_db    
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:5433:5432
+    volumes:
+      - datasharing_data:/var/lib/postgres/data
+    environment:
+      - POSTGRES_HOST=datasharing_db
+      - POSTGRES_PASSWORD=example
+      - PGDATA=/var/lib/postgres/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      datasharing_net:
+
+  datasharing_backend:
+    container_name: datasharing_backend
+    image: rallendes/datasharing_backend
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:5000:5000
+    volumes:
+      - datasharing_data:/etc/data
+    networks:
+      datasharing_net:
+    depends_on:
+      - datasharing_db
+
+  datasharing_enquirer:
+    container_name: datasharing_enquirer
+    image: rallendes/datasharing_enquirer
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:4200:80 
+    networks:
+      datasharing_net:
+    depends_on:
+      - datasharing_db
+
+volumes:
+  datasharing_data:
+    name: datasharing_volume
+
+networks:
+  datasharing_net:
+    driver: bridge
