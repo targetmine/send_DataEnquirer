@@ -28,6 +28,7 @@ services:
       - 127.0.0.1:5000:5000
     volumes:
       - datasharing_data:/etc/data
+      - ./backup/model.json:/etc/data/model.json
     networks:
       datasharing_net:
     depends_on:
