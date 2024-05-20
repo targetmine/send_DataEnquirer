@@ -1,12 +1,12 @@
 services:
   datasharing_db:
     image: postgres
-    container_name: datasharing_db
+    container_name: send_db
     restart: unless-stopped
     ports:
       - 127.0.0.1:5433:5432
     volumes:
-      - datasharing_data:/var/lib/postgres/data
+      - send_data:/var/lib/postgres/data
       - ./backup/backup.sql:/docker-entrypoint-initdb.d/dummy_dump.sql
     environment:
       - POSTGRES_HOST=datasharing_db
@@ -18,37 +18,37 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      datasharing_net:
+      send_net:
     
-  datasharing_backend:
+  send_backend:
     container_name: datasharing_backend
     image: rallendes/datasharing_backend
     restart: unless-stopped
     ports:
       - 127.0.0.1:5000:5000
     volumes:
-      - datasharing_data:/etc/data
+      - send_data:/etc/data
       - ./backup/model.json:/etc/data/model.json
     networks:
-      datasharing_net:
+      send_net:
     depends_on:
       - datasharing_db
 
-  datasharing_enquirer:
-    container_name: datasharing_enquirer
+  send_enquirer:
+    container_name: send_enquirer
     image: rallendes/datasharing_enquirer
     restart: unless-stopped
     ports:
       - 127.0.0.1:4200:80 
     networks:
-      datasharing_net:
+      send_net:
     depends_on:
       - datasharing_db
 
 volumes:
-  datasharing_data:
-    name: datasharing_volume
+  send_data:
+    name: send_volume
 
 networks:
-  datasharing_net:
+  send_net:
     driver: bridge
