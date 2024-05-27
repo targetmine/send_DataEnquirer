@@ -21,8 +21,8 @@ services:
       send_net:
     
   send_backend:
-    container_name: datasharing_backend
-    image: rallendes/datasharing_backend
+    container_name: send_backend
+    image: rallendes/send_backend
     restart: unless-stopped
     ports:
       - 127.0.0.1:5000:5000
@@ -36,7 +36,7 @@ services:
 
   send_enquirer:
     container_name: send_enquirer
-    image: rallendes/datasharing_enquirer
+    image: rallendes/send_enquirer
     restart: unless-stopped
     ports:
       - 127.0.0.1:4200:80 
